@@ -8,7 +8,8 @@ import {
   type DocumentReaderDetailType,
   type DocumentReaderWebComponent,
 } from "@regulaforensics/vp-frontend-document-components";
-import logo from "./assets/logo-white.png";
+
+import logo from "./assets/logo_white.png";
 import { getDOMForLabel, getFragmentForFields } from "./utils";
 import jsPDF from "jspdf";
 import { TextExt } from "@regulaforensics/document-reader-webclient";
@@ -36,6 +37,7 @@ const buttonStyle: CSSProperties = {
 
 function App() {
   const [isOpen, setIsOpen] = useState(false);
+  const [verificationResult, setVerificationResult] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const elementRef = useRef<DocumentReaderWebComponent>(null);
   const resultRef = useRef<HTMLDivElement>(null);
@@ -49,33 +51,30 @@ function App() {
   };
 
   function showResult(isFinish: boolean, fields: TextExt, faceImage: string) {
+    const foundFields: [string, string][] = [];
     const { fieldList } = fields;
     const printButton = document.querySelector("#print")!;
-    const emailButton = document.querySelector("#email")!;
+    //const emailButton = document.querySelector("#email")!;
 
     let pdfBlob;
 
     const result = document.createDocumentFragment();
     // Scanned document result modal Header
+    /*
     const header = document.createElement("div");
     header.style.display = "flex";
     header.style.flexDirection = "column";
     header.style.alignItems = "center";
-    const h2 = document.createElement("h2");
-    h2.textContent = isFinish
-      ? "ID Verification Result: Successful"
-      : "ID Verification Result: Failed";
-    h2.style.color = h2.textContent.includes("Successful") ? "green" : "red";
-
+    const btn = document.createElement("btn");
+    btn.textContent = "Become a Member Now";
     const img = document.createElement("img");
     img.src = logo;
-    img.style.height = "120px";
-    header.append(img);
-
-    header.append(h2);
-    const foundFields: [string, unknown][] = [];
-    foundFields.push(["Verification Result", h2.textContent]);
-
+    img.style.height = "100px";
+   // header.append(img);
+    //header.append(btn);
+    //header.append(h2);
+    //foundFields.push(["Verification Result", h2.textContent]);
+*/
     if (faceImage) {
       const portraitImage = new Image();
       result.append(getDOMForLabel("Face"));
@@ -103,8 +102,8 @@ function App() {
     });
 
     // console.log({ foundFields });
-    elements.resultHeader.append(header);
-    elements.resultContent.textContent = "";
+    // elements.resultHeader.append(header);
+    //elements.resultContent.textContent = "";
 
     if (foundFields.length) result.append(getFragmentForFields(foundFields));
     elements.resultContent.append(result);
@@ -114,13 +113,13 @@ function App() {
     const resultContentDiv: HTMLElement | null =
       document.querySelector("#result-content");
     if (resultContentDiv) {
-      jsPdf.setTextColor(
+      /*  jsPdf.setTextColor(
         h2.textContent && h2.textContent.includes("Successful")
           ? "green"
           : "red"
-      );
+      ); */
       console.log({ resultContentDiv });
-      jsPdf.text(h2?.textContent as string, 240, 130);
+      //  jsPdf.text(h2?.textContent as string, 240, 130);
       jsPdf.html(resultContentDiv, {
         callback: function (jsPdf: jsPDF) {
           pdfBlob = jsPdf.output("blob");
@@ -142,6 +141,7 @@ function App() {
     }
 
     resultRef.current && (resultRef.current.style.display = "block");
+    console.log({ isOpen });
   }
 
   const listener = (data: CustomEvent<DocumentReaderDetailType>) => {
@@ -153,14 +153,14 @@ function App() {
       const isFinishStatus = status === 1 || status === 0;
 
       if (!isFinishStatus || !data.detail.data?.response) return;
-
+      setVerificationResult(true);
       if (
-        response?.images?.fieldList &&
-        Array.isArray(response.images.fieldList)
+        response?.response?.images?.fieldList &&
+        Array.isArray(response?.response.images.fieldList)
       ) {
-        faceImage = response.images.fieldList[1].valueList[0].value;
+        faceImage = response?.response?.images.fieldList[1].valueList[0].value;
       }
-      if (fields) showResult(isFinishStatus, fields, faceImage);
+      if (fields) showResult(isFinishStatus, fields, faceImage as string);
 
       //window.RegulaDocumentSDK.finalizePackage();
     }
@@ -259,8 +259,25 @@ function App() {
         }}
       >
         <div id="result">
-          <div id="result-header"></div>
-          <div id="result-content">hello there</div>
+          <div
+            id="result-header"
+            style={{ display: "flex", flexDirection: "column" }}
+          >
+            <img src={logo} alt="rented123" width="80px" />
+            <button style={buttonStyle}>
+              Get all the Benefits of Membership{" "}
+            </button>
+          </div>
+          <div id="result-content">
+            <h2
+              style={{
+                textAlign: "center",
+                color: verificationResult ? "green" : "red",
+              }}
+            >{`ID Verification ${
+              verificationResult ? "Successful" : "Failed"
+            }`}</h2>
+          </div>
           <div id="result-footer">
             <button
               onClick={() => {
