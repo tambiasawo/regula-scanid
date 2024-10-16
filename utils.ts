@@ -10,20 +10,20 @@ function getFragmentForLabelAndValue(
   value: unknown
 ): DocumentFragment {
   const fragment = document.createDocumentFragment();
-  fragment.append(getDOMForLabel(labelText, ""));
+  fragment.append(getDOMForLabel(labelText));
   fragment.append(getDOMOfFormattedValue(value));
 
   return fragment;
 }
 
-function getFragmentForFields(fields: [string, unknown][]): DocumentFragment {
+function getFragmentForFields(fields: [string, string][]): DocumentFragment {
   let paragraph, paragraphContent;
   const fragment = document.createDocumentFragment();
 
   for (const [label, value] of fields) {
-    if (label === "Verification Result") {
+    /* if (label === "Verification Result") {
       continue;
-    }
+    } */
     paragraph = getDOMForLabel(label);
     paragraphContent = getDOMForLabel(value);
     fragment.append(paragraph);
