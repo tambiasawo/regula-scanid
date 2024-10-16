@@ -131,6 +131,11 @@ body {
   padding: 1em 1rem;
   font-weight: bold;
   background-color: #eee;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 20px;
 }
 
 #result-content {
